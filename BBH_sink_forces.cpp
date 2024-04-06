@@ -65,7 +65,7 @@ static Real tcool;
 static Real dfloor;
 static Real rindamp, routdamp;
 static Real insert_time;
-static Real gauss_width, a_bin, eccent, nmax, mass_sink;
+static Real gauss_width, a_bin, eccent, nmax, mass_sink, f;
 // static Real f_acc_x, f_acc_y, f_acc_z; // need these as global variables in order to access them in BinaryForce
 //Real voluume;
 //----------------------------------------
@@ -279,7 +279,7 @@ void Mesh::InitUserMeshData(ParameterInput *pin) {
 
   // enroll planetary potential
   EnrollUserExplicitSourceFunction(AllSourceTerms);
-  AllocateUserHistoryOutput(46);
+  AllocateUserHistoryOutput(47);
   EnrollUserHistoryOutput(0, BinaryForce, "fr1");
   EnrollUserHistoryOutput(1, BinaryForce, "ft1");
   EnrollUserHistoryOutput(2, BinaryForce, "fp1");
@@ -326,6 +326,7 @@ void Mesh::InitUserMeshData(ParameterInput *pin) {
   EnrollUserHistoryOutput(43, BinaryForce, "f_grav_y2");
   EnrollUserHistoryOutput(44, BinaryForce, "f_grav_z1");
   EnrollUserHistoryOutput(45, BinaryForce, "f_grav_z2");
+  EnrollUserHistoryOutput(46, BinaryForce, "sink_frac");
 
   EnrollViscosityCoefficient(AlphaVis);
 
@@ -866,7 +867,7 @@ void BinarySourceTerms(MeshBlock *pmb, const Real time, const Real dt,
             Real vpptheta = 0; // from the SMBH POV
 
             Real dist = sqrt((xcar-xpp)*(xcar-xpp) + (ycar-ypp)*(ycar-ypp) + (zcar-zpp)*(zcar-zpp));
-            Real f = sink_fraction(dist/r_s); 
+            f = sink_fraction(dist/r_s); 
 
             // cons(IDN,k,j,i)=1;
             // cons(IM1,k,j,i)=1;
@@ -1185,6 +1186,7 @@ Real BinaryForce(MeshBlock *pmb, int iout)
         if (iout==43&&ip==1) return f_ypp;
         if (iout==44&&ip==0) return f_zpp;
         if (iout==45&&ip==1) return f_zpp;
+        if (iout==46&&ip==0) return f;
 
           
         // if (iout==14&&ip==0) return xpp;
